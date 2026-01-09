@@ -17,6 +17,10 @@ async function main() {
     const searchResp = await fetch(`${BASE_URL}/account?keyword=${encodeURIComponent(keyword)}`);
     const searchJson = await searchResp.json() as Response<any>;
 
+    console.log('\n--- API: /account Response ---');
+    console.log(JSON.stringify(searchJson, null, 2));
+    console.log('------------------------------\n');
+
     if (searchJson.base_resp?.ret !== 0) {
         console.error('Search failed:', searchJson);
         return;
@@ -37,6 +41,10 @@ async function main() {
     const articleResp = await fetch(`${BASE_URL}/article?fakeid=${fakeid}`);
     const articleJson = await articleResp.json() as any;
 
+    console.log('\n--- API: /article Response ---');
+    console.log(JSON.stringify(articleJson, null, 2));
+    console.log('------------------------------\n');
+
     if (articleJson.base_resp?.ret !== 0) {
         console.error('Get articles failed:', articleJson);
         return;
@@ -55,7 +63,7 @@ async function main() {
     console.log(`\nFetching content for article: ${firstArticle.title}`);
     console.log(`URL: ${firstArticle.link}`);
 
-    const contentResp = await fetch(`${BASE_URL}/download?url=${encodeURIComponent(firstArticle.link)}&format=text`);
+    const contentResp = await fetch(`${BASE_URL}/download?url=${encodeURIComponent(firstArticle.link)}&format=markdown`);
 
     if (!contentResp.ok) {
         console.error('Download failed:', await contentResp.text());
@@ -63,8 +71,8 @@ async function main() {
     }
 
     const content = await contentResp.text();
-    console.log('--- Content Preview (first 200 chars) ---');
-    console.log(content.substring(0, 200));
+    console.log('--- Content Preview ---');
+    console.log(content);
     console.log('-----------------------------------------');
 }
 
