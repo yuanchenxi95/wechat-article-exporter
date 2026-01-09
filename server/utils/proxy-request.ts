@@ -21,10 +21,11 @@ export async function proxyMpRequest(options: RequestOptions) {
   });
 
   // 从 CookieStore 中读取 cookie
-  const cookie: string | null = (await getCookieFromStore(options.event));
+  const cookie: string | null = options.cookie || (await getCookieFromStore(options.event));
   if (cookie) {
     headers.set('Cookie', cookie);
   }
+  console.log('cookie', cookie);
 
   const requestInit: RequestInit = {
     method: options.method,
