@@ -9,6 +9,7 @@ interface SearchBizQuery {
 
 export default defineEventHandler(async event => {
   const token = await getTokenFromStore(event);
+  console.log(token);
 
   if (!token) {
     return {

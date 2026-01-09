@@ -28,3 +28,6 @@ docs
 
 # wrangler
 .wrangler
+
+# db
+server/data/db.json

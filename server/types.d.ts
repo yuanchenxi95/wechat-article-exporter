@@ -20,3 +20,10 @@ export interface RequestOptions {
    */
   action?: 'start_login' | 'login' | 'switch_account';
 }
+
+export type CookieEntity = Record<string, string | number>;
+
+export interface CookieKVValue {
+  token: string;
+  cookies: CookieEntity[];
+}

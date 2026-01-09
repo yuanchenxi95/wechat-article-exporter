@@ -1,8 +1,10 @@
 import { H3Event, parseCookies } from 'h3';
-import { CookieKVValue, getMpCookie, setMpCookie } from '~/server/kv/cookie';
+import { getMpCookie, setMpCookie } from '~/server/kv/cookie';
+import { type CookieKVValue, type CookieEntity } from '~/server/types';
+import { db } from '~/server/utils/db';
 
 // 表示一条 set-cookie 记录的解析结果
-export type CookieEntity = Record<string, string | number>;
+
 
 // 公众号所有的 set-cookie 解析结果
 export class AccountCookie {
@@ -112,6 +114,7 @@ class CookieStore {
   store: Map<string, AccountCookie> = new Map<string, AccountCookie>();
 
   async getAccountCookie(authKey: string): Promise<AccountCookie | null> {
+    console.log('getAccountCookie', authKey);
     // 优先从本地内存取
     let cachedAccountCookie = this.store.get(authKey);
 
@@ -191,20 +194,13 @@ export const cookieStore = new CookieStore();
 export async function getCookieFromStore(event: H3Event): Promise<string | null> {
   let cookie: string | null = null;
 
-  // 优先根据自定义的 X-Auth-Key 检索
-  let authKey = getRequestHeader(event, 'X-Auth-Key');
-  if (authKey) {
-    cookie = await cookieStore.getCookie(authKey);
-    if (cookie) {
-      return cookie;
-    }
-  }
-
-  // 从 cookie 中的 token 检索
-  const cookies = parseCookies(event);
-  authKey = cookies['auth-key'];
-  if (authKey) {
-    cookie = await cookieStore.getCookie(authKey);
+  // Fallback to any available authenticated user
+  await db.read();
+  const authKeys = Object.keys(db.data.cookies);
+  if (authKeys.length > 0) {
+    // try the first one
+    const firstAuthKey = authKeys[0];
+    cookie = await cookieStore.getCookie(firstAuthKey);
     if (cookie) {
       return cookie;
     }
@@ -222,20 +218,13 @@ export async function getCookieFromStore(event: H3Event): Promise<string | null>
 export async function getTokenFromStore(event: H3Event): Promise<string | null> {
   let token: string | null = null;
 
-  // 优先根据自定义的 X-Auth-Key 检索
-  let authKey = getRequestHeader(event, 'X-Auth-Key');
-  if (authKey) {
-    token = await cookieStore.getToken(authKey);
-    if (token) {
-      return token;
-    }
-  }
-
-  // 从 cookie 中的 token 检索
-  const cookies = parseCookies(event);
-  authKey = cookies['auth-key'];
-  if (authKey) {
-    token = await cookieStore.getToken(authKey);
+  // Fallback to any available authenticated user
+  await db.read();
+  const authKeys = Object.keys(db.data.cookies);
+  if (authKeys.length > 0) {
+    // try the first one
+    const firstAuthKey = authKeys[0];
+    token = await cookieStore.getToken(firstAuthKey);
     if (token) {
       return token;
     }

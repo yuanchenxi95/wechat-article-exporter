@@ -1,27 +1,25 @@
-import { type CookieEntity } from '~/server/utils/CookieStore';
+import { type CookieKVValue, type CookieEntity } from '~/server/types';
+import { db } from '~/server/utils/db';
 
 export type CookieKVKey = string;
 
-export interface CookieKVValue {
-  token: string;
-  cookies: CookieEntity[];
-}
-
 export async function setMpCookie(key: CookieKVKey, data: CookieKVValue): Promise<boolean> {
-  const kv = useStorage('kv');
   try {
-    await kv.set<CookieKVValue>(`cookie:${key}`, data, {
-      // https://developers.cloudflare.com/kv/api/write-key-value-pairs/#expiring-keys
-      expirationTtl: 60 * 60 * 24 * 4, // 4 days
-    });
+    await db.read();
+    db.data.cookies[key] = data;
+    db.data.latestAuthKey = key;
+    await db.write();
+
     return true;
   } catch (err) {
-    console.error('kv.set call failed:', err);
+    console.error('db.write call failed:', err);
     return false;
   }
 }
 
 export async function getMpCookie(key: CookieKVKey): Promise<CookieKVValue | null> {
-  const kv = useStorage('kv');
-  return await kv.get<CookieKVValue>(`cookie:${key}`);
+  await db.read();
+  const value = db.data.cookies[key];
+  console.log(db.data)
+  return value || null;
 }

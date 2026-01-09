@@ -20,8 +20,8 @@ export async function proxyMpRequest(options: RequestOptions) {
     'User-Agent': USER_AGENT,
   });
 
-  // 优先读取参数中的 cookie，若无则从 CookieStore 中读取
-  const cookie: string | null = options.cookie || (await getCookieFromStore(options.event));
+  // 从 CookieStore 中读取 cookie
+  const cookie: string | null = (await getCookieFromStore(options.event));
   if (cookie) {
     headers.set('Cookie', cookie);
   }
