@@ -1,17 +1,17 @@
 # 编译层
 FROM node:22-alpine AS build-env
 
-# 安装 Yarn (pin a specific Yarn version)
+# 安装 pnpm
 RUN corepack enable
-RUN corepack prepare yarn@1.22.22 --activate
+RUN corepack prepare pnpm@10.27.0 --activate
 
 
 # 设置工作目录
 WORKDIR /app
 
 # 复制 package.json 和 lock 文件，安装依赖
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production=true && yarn cache clean
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod && pnpm store prune
 
 # 复制源代码
 COPY . .
@@ -21,7 +21,7 @@ ENV NODE_ENV=production \
     NITRO_KV_DRIVER=fs \
     NITRO_KV_BASE=.data/kv
 
-RUN yarn build
+RUN pnpm build
 
 
 # 运行时层

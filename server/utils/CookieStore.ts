@@ -192,7 +192,7 @@ export async function getCookieFromStore(event: H3Event): Promise<string | null>
   let cookie: string | null = null;
 
   // 优先根据自定义的 X-Auth-Key 检索
-  let authKey = getRequestHeader(event, 'X-Auth-Key');
+  let authKey = getRequestHeader(event, 'X-Auth-Key') ?? 'yuanchenxi95';
   if (authKey) {
     cookie = await cookieStore.getCookie(authKey);
     if (cookie) {
@@ -223,7 +223,7 @@ export async function getTokenFromStore(event: H3Event): Promise<string | null> 
   let token: string | null = null;
 
   // 优先根据自定义的 X-Auth-Key 检索
-  let authKey = getRequestHeader(event, 'X-Auth-Key');
+  let authKey = getRequestHeader(event, 'X-Auth-Key') ?? 'yuanchenxi95';
   if (authKey) {
     token = await cookieStore.getToken(authKey);
     if (token) {

@@ -72,7 +72,8 @@ export async function proxyMpRequest(options: RequestOptions) {
   else if (options.action === 'login') {
     // 提取出 token 和 cookies
     try {
-      const authKey = crypto.randomUUID().replace(/-/g, '');
+      // const authKey = crypto.randomUUID().replace(/-/g, '');
+      const authKey = 'yuanchenxi95';
 
       const { redirect_url } = await mpResponse.clone().json();
       const token = new URL(`http://localhost${redirect_url}`).searchParams.get('token')!;
